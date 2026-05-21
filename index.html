@@ -7,373 +7,299 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-
 :root{
-  --gold:#c9a84c;
-  --gold-light:#e8d5a3;
-  --rose:#b5546a;
-  --rose-light:#e8c5ce;
-  --dark:#100a0d;
-  --dark2:#1e1218;
-  --cream:#fdf8f0;
+  --gold:#c9a84c;--gold-light:#e8d5a3;
+  --rose:#b5546a;--rose-light:#e8c5ce;
+  --dark:#100a0d;--dark2:#1e1218;--cream:#fdf8f0;
 }
+html,body{width:100%;min-height:100%;background:var(--dark);color:var(--cream);font-family:'Jost',sans-serif;font-weight:300;overflow-x:hidden;}
 
-html,body{
-  width:100%;min-height:100%;
+/* ══ SPLASH ══ */
+#splash{
+  position:fixed;inset:0;z-index:100;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--dark);
-  color:var(--cream);
-  font-family:'Jost',sans-serif;
-  font-weight:300;
-  overflow-x:hidden;
-}
-
-/* ===================== PETALS ===================== */
-#petals{
-  position:fixed;inset:0;
-  pointer-events:none;z-index:0;
-}
-
-/* ===================== STAGES ===================== */
-.stage{
-  position:fixed;inset:0;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  z-index:10;
-  opacity:0;
-  pointer-events:none;
+  cursor:pointer;
   transition:opacity 0.8s ease;
 }
-.stage.active{opacity:1;pointer-events:auto;}
-.stage.out{
-  opacity:0;
-  transition:opacity 0.6s ease;
-  pointer-events:none;
+#splash::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 30% 40%,rgba(181,84,106,0.13) 0%,transparent 60%),
+    radial-gradient(ellipse at 70% 65%,rgba(201,168,76,0.09) 0%,transparent 55%);
+}
+#splash.hide{opacity:0;pointer-events:none;}
+
+.splash-rose{
+  font-size:56px;
+  animation:floatRose 3s ease-in-out infinite;
+  margin-bottom:28px;
+  position:relative;z-index:1;
+}
+.splash-title{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-weight:300;
+  font-size:clamp(15px,3vw,22px);
+  color:rgba(253,248,240,0.5);
+  letter-spacing:0.1em;
+  margin-bottom:8px;
+  position:relative;z-index:1;
+}
+.splash-name{
+  font-family:'Cormorant Garamond',serif;
+  font-weight:600;
+  font-size:clamp(42px,11vw,88px);
+  line-height:1;
+  background:linear-gradient(135deg,#e8d5a3 0%,#c9a84c 38%,#e8c5ce 65%,#b5546a 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  position:relative;z-index:1;
+  margin-bottom:48px;
+}
+.tap-btn{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.tap-ring{
+  width:72px;height:72px;border-radius:50%;
+  border:1px solid rgba(201,168,76,0.35);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  animation:ripple 2s ease infinite;
+}
+.tap-ring::before{
+  content:'';position:absolute;inset:-8px;
+  border-radius:50%;border:1px solid rgba(201,168,76,0.15);
+  animation:ripple 2s ease 0.4s infinite;
+}
+.tap-ring svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;}
+.tap-label{
+  font-family:'Jost',sans-serif;font-weight:200;
+  font-size:11px;letter-spacing:0.45em;
+  color:rgba(201,168,76,0.6);text-transform:uppercase;
 }
 
-/* dark radial bg on each stage */
+/* ══ MUTE BTN ══ */
+#mute-btn{
+  position:fixed;top:18px;right:18px;z-index:99;
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(201,168,76,0.3);
+  background:rgba(16,10,13,0.75);
+  backdrop-filter:blur(8px);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.5s ease,border-color 0.3s ease;
+}
+#mute-btn.show{opacity:1;pointer-events:auto;}
+#mute-btn:hover{border-color:rgba(201,168,76,0.65);}
+#mute-btn svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+
+/* ══ PETALS ══ */
+#petals{position:fixed;inset:0;pointer-events:none;z-index:0;}
+
+/* ══ STAGES ══ */
+.stage{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:10;opacity:0;pointer-events:none;transition:opacity 0.8s ease;
+}
+.stage.active{opacity:1;pointer-events:auto;}
+.stage.out{opacity:0;transition:opacity 0.6s ease;pointer-events:none;}
 .stage::before{
-  content:'';
-  position:absolute;inset:0;
+  content:'';position:absolute;inset:0;
   background:
-    radial-gradient(ellipse at 30% 40%, rgba(181,84,106,0.10) 0%,transparent 60%),
-    radial-gradient(ellipse at 70% 60%, rgba(201,168,76,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse at 30% 40%,rgba(181,84,106,0.10) 0%,transparent 60%),
+    radial-gradient(ellipse at 70% 60%,rgba(201,168,76,0.07) 0%,transparent 55%),
     var(--dark);
   z-index:-1;
 }
 
-/* ===================== COUNTDOWN ===================== */
-#stage-countdown{background:var(--dark);}
+/* ══ COUNTDOWN ══ */
 #stage-countdown::before{display:none;}
-
-.countdown-ring{
-  position:relative;
-  width:200px;height:200px;
-}
-.countdown-ring svg{
-  position:absolute;inset:0;
-  transform:rotate(-90deg);
-}
+.countdown-ring{position:relative;width:200px;height:200px;}
+.countdown-ring svg{position:absolute;inset:0;transform:rotate(-90deg);}
 .ring-bg{fill:none;stroke:rgba(201,168,76,0.12);stroke-width:3;}
 .ring-fg{
-  fill:none;stroke:var(--gold);stroke-width:3;
-  stroke-linecap:round;
-  stroke-dasharray:565;
-  stroke-dashoffset:0;
+  fill:none;stroke:var(--gold);stroke-width:3;stroke-linecap:round;
+  stroke-dasharray:565;stroke-dashoffset:0;
   transition:stroke-dashoffset 0.95s linear;
 }
 .countdown-num{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Cormorant Garamond',serif;
-  font-size:100px;font-weight:300;
-  color:var(--gold);
-  line-height:1;
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Cormorant Garamond',serif;font-size:100px;font-weight:300;
+  color:var(--gold);line-height:1;
+  transition:opacity 0.2s ease,transform 0.2s ease;
 }
 .countdown-label{
-  margin-top:28px;
-  font-family:'Jost',sans-serif;
-  font-weight:200;
-  font-size:12px;
-  letter-spacing:0.45em;
-  color:rgba(201,168,76,0.5);
-  text-transform:uppercase;
+  margin-top:28px;font-family:'Jost',sans-serif;font-weight:200;
+  font-size:12px;letter-spacing:0.45em;color:rgba(201,168,76,0.5);text-transform:uppercase;
 }
 
-/* ===================== HAPPY BIRTHDAY ===================== */
+/* ══ HAPPY BIRTHDAY ══ */
 #stage-hb{text-align:center;padding:24px;}
-
 .hb-line1{
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;
-  font-weight:300;
-  font-size:clamp(22px,5vw,38px);
-  color:rgba(253,248,240,0.6);
-  letter-spacing:0.12em;
-  opacity:0;
-  transform:translateY(16px);
-  transition:opacity 0.8s ease, transform 0.8s ease;
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;
+  font-size:clamp(22px,5vw,38px);color:rgba(253,248,240,0.6);letter-spacing:0.12em;
+  opacity:0;transform:translateY(16px);transition:opacity 0.8s ease,transform 0.8s ease;
 }
 .hb-line1.show{opacity:1;transform:none;}
-
 .hb-name{
-  font-family:'Cormorant Garamond',serif;
-  font-weight:600;
-  font-size:clamp(52px,14vw,120px);
-  line-height:1;
-  letter-spacing:0.03em;
+  font-family:'Cormorant Garamond',serif;font-weight:600;
+  font-size:clamp(52px,14vw,120px);line-height:1;letter-spacing:0.03em;
   background:linear-gradient(135deg,#e8d5a3 0%,#c9a84c 38%,#e8c5ce 65%,#b5546a 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
-  opacity:0;
-  transform:scale(0.85);
-  transition:opacity 1s ease 0.35s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.35s;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  opacity:0;transform:scale(0.85);
+  transition:opacity 1s ease 0.35s,transform 1s cubic-bezier(0.16,1,0.3,1) 0.35s;
 }
 .hb-name.show{opacity:1;transform:scale(1);}
-
 .hb-hearts{
-  display:flex;align-items:center;justify-content:center;
-  gap:14px;
-  margin-top:18px;
-  opacity:0;
-  transition:opacity 0.8s ease 1s;
+  display:flex;align-items:center;justify-content:center;gap:14px;margin-top:18px;
+  opacity:0;transition:opacity 0.8s ease 1s;
 }
 .hb-hearts.show{opacity:1;}
 .hb-heart{
-  width:10px;height:10px;
-  background:var(--rose);
-  transform:rotate(45deg);
-  position:relative;
-  animation:heartbeat 1.4s ease infinite;
+  width:10px;height:10px;background:var(--rose);transform:rotate(45deg);
+  position:relative;animation:heartbeat 1.4s ease infinite;
 }
-.hb-heart::before,.hb-heart::after{
-  content:'';position:absolute;
-  width:10px;height:10px;
-  background:var(--rose);
-  border-radius:50%;
-}
+.hb-heart::before,.hb-heart::after{content:'';position:absolute;width:10px;height:10px;background:var(--rose);border-radius:50%;}
 .hb-heart::before{left:-5px;top:0;}
 .hb-heart::after{left:0;top:-5px;}
 .hb-heart:nth-child(2){animation-delay:0.2s;transform:rotate(45deg) scale(1.3);}
 .hb-heart:nth-child(3){animation-delay:0.4s;}
-
 .hb-sub{
-  margin-top:24px;
-  font-family:'Jost',sans-serif;
-  font-weight:200;
-  font-size:clamp(12px,2vw,15px);
-  letter-spacing:0.35em;
-  color:rgba(253,248,240,0.4);
-  text-transform:uppercase;
-  opacity:0;
-  transition:opacity 0.8s ease 1.4s;
+  margin-top:24px;font-family:'Jost',sans-serif;font-weight:200;
+  font-size:clamp(12px,2vw,15px);letter-spacing:0.35em;
+  color:rgba(253,248,240,0.4);text-transform:uppercase;
+  opacity:0;transition:opacity 0.8s ease 1.4s;
 }
 .hb-sub.show{opacity:1;}
 
-/* ===================== SCROLL SECTIONS ===================== */
-#stage-scroll{
-  position:relative;
-  z-index:5;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 1s ease;
-  /* not fixed — normal flow */
-  display:block;
-}
-#stage-scroll.active{
-  opacity:1;
-  pointer-events:auto;
-  position:relative;
-}
-
-/* stars subtle bg */
+/* ══ SCROLL ══ */
 .scroll-bg{
   position:fixed;inset:0;
   background:
     radial-gradient(ellipse at 20% 30%,rgba(181,84,106,0.07) 0%,transparent 55%),
     radial-gradient(ellipse at 75% 70%,rgba(201,168,76,0.05) 0%,transparent 50%),
     var(--dark);
-  z-index:1;pointer-events:none;
-  opacity:0;transition:opacity 1s ease;
+  z-index:1;pointer-events:none;opacity:0;transition:opacity 1s ease;
 }
 .scroll-bg.active{opacity:1;}
+#stage-scroll{position:relative;z-index:2;opacity:0;pointer-events:none;transition:opacity 1s ease;display:block;}
+#stage-scroll.active{opacity:1;pointer-events:auto;}
 
-/* ===================== PHOTOS SECTION ===================== */
 .section{
-  position:relative;z-index:2;
-  min-height:100vh;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
+  position:relative;z-index:2;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:80px 24px;
 }
-
 .sec-label{
-  font-family:'Jost',sans-serif;
-  font-weight:200;font-size:11px;
-  letter-spacing:0.42em;
-  color:var(--gold);
-  text-transform:uppercase;
-  text-align:center;
-  margin-bottom:8px;
+  font-family:'Jost',sans-serif;font-weight:200;font-size:11px;
+  letter-spacing:0.42em;color:var(--gold);text-transform:uppercase;
+  text-align:center;margin-bottom:8px;
 }
 .sec-heading{
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;font-weight:300;
-  font-size:clamp(28px,6vw,52px);
-  color:var(--cream);
-  text-align:center;
-  margin-bottom:52px;
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;
+  font-size:clamp(28px,6vw,52px);color:var(--cream);text-align:center;margin-bottom:52px;
 }
 
-.photos-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:16px;
-  width:min(860px,100%);
-}
-@media(max-width:600px){
-  .photos-grid{grid-template-columns:1fr;}
-}
-
+/* ══ PHOTOS ══ */
+.photos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:min(860px,100%);}
+@media(max-width:600px){.photos-grid{grid-template-columns:1fr;}}
 .photo-card{
-  aspect-ratio:3/4;
-  border:1px solid rgba(201,168,76,0.2);
-  border-radius:2px;
-  overflow:hidden;
-  position:relative;
-  background:var(--dark2);
-  opacity:0;
-  transform:translateY(40px) scale(0.96);
-  transition:opacity 0.85s ease, transform 0.85s cubic-bezier(0.16,1,0.3,1),
-             border-color 0.4s ease;
+  aspect-ratio:3/4;border:1px solid rgba(201,168,76,0.2);border-radius:2px;
+  overflow:hidden;position:relative;background:var(--dark2);
+  opacity:0;transform:translateY(40px) scale(0.96);
+  transition:opacity 0.85s ease,transform 0.85s cubic-bezier(0.16,1,0.3,1),border-color 0.4s ease;
 }
 .photo-card.pop{opacity:1;transform:translateY(0) scale(1);}
 .photo-card:hover{border-color:rgba(201,168,76,0.45);transform:translateY(-4px) scale(1);}
-
-.photo-card img{
-  width:100%;height:100%;
-  object-fit:cover;display:block;
-}
+.photo-card img{width:100%;height:100%;object-fit:cover;display:block;}
 .photo-placeholder{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:10px;
-  color:rgba(201,168,76,0.25);
-  font-size:10px;letter-spacing:0.3em;
-  text-transform:uppercase;
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;
+  color:rgba(201,168,76,0.25);font-size:10px;letter-spacing:0.3em;text-transform:uppercase;
 }
 .photo-placeholder svg{width:28px;height:28px;opacity:0.25;}
 .photo-caption{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:36px 14px 14px;
+  position:absolute;bottom:0;left:0;right:0;padding:36px 14px 14px;
   background:linear-gradient(transparent,rgba(8,4,6,0.88));
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;font-size:15px;
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:15px;
   color:var(--gold-light);text-align:center;
 }
 
-/* ===================== LETTER ===================== */
-.letter-section{
-  background:radial-gradient(ellipse at center,rgba(181,84,106,0.07) 0%,transparent 65%);
-}
+/* ══ LETTER ══ */
+.letter-section{background:radial-gradient(ellipse at center,rgba(181,84,106,0.07) 0%,transparent 65%);}
+.divider{display:flex;align-items:center;gap:14px;width:min(280px,80%);margin:0 auto 52px;}
+.div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.div-gem{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
 .letter-wrap{
-  width:min(680px,100%);
-  border:1px solid rgba(201,168,76,0.18);
-  padding:clamp(32px,6vw,68px);
-  position:relative;
-  background:rgba(255,255,255,0.018);
-  opacity:0;
-  transform:translateY(32px);
-  transition:opacity 1s ease, transform 1s ease;
+  width:min(680px,100%);border:1px solid rgba(201,168,76,0.18);
+  padding:clamp(32px,6vw,68px);position:relative;background:rgba(255,255,255,0.018);
+  opacity:0;transform:translateY(32px);transition:opacity 1s ease,transform 1s ease;
 }
 .letter-wrap.reveal{opacity:1;transform:none;}
-
-/* corner accents */
 .letter-wrap::before,.letter-wrap::after{
-  content:'';position:absolute;
-  width:22px;height:22px;
-  border-color:rgba(201,168,76,0.45);
-  border-style:solid;
+  content:'';position:absolute;width:22px;height:22px;
+  border-color:rgba(201,168,76,0.45);border-style:solid;
 }
 .letter-wrap::before{top:-1px;left:-1px;border-width:1px 0 0 1px;}
 .letter-wrap::after{bottom:-1px;right:-1px;border-width:0 1px 1px 0;}
-
-.letter-dear{
-  display:block;
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;font-size:clamp(16px,3vw,22px);
-  color:var(--gold);margin-bottom:24px;
-}
-.letter-body{
-  font-family:'Cormorant Garamond',serif;
-  font-size:clamp(17px,2.4vw,22px);
-  line-height:1.9;
-  color:rgba(253,248,240,0.86);
-}
+.letter-dear{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,3vw,22px);color:var(--gold);margin-bottom:24px;}
+.letter-body{font-family:'Cormorant Garamond',serif;font-size:clamp(17px,2.4vw,22px);line-height:1.9;color:rgba(253,248,240,0.86);}
 .letter-body p+p{margin-top:20px;}
-.letter-sig{
-  display:block;
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;font-size:clamp(16px,3vw,22px);
-  color:var(--gold);
-  text-align:right;margin-top:32px;
-}
+.letter-sig{display:block;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(16px,3vw,22px);color:var(--gold);text-align:right;margin-top:32px;}
 
-/* divider */
-.divider{
-  display:flex;align-items:center;gap:14px;
-  width:min(280px,80%);margin:0 auto 52px;
-}
-.div-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
-.div-gem{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
-
-/* ===================== FINAL ===================== */
-.final-section{
-  min-height:60vh;
-  text-align:center;
-}
+/* ══ FINAL ══ */
+.final-section{min-height:60vh;text-align:center;}
 .final-big{
-  font-family:'Cormorant Garamond',serif;
-  font-style:italic;font-weight:300;
-  font-size:clamp(38px,9vw,86px);
-  line-height:1.1;
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;
+  font-size:clamp(38px,9vw,86px);line-height:1.1;
   background:linear-gradient(135deg,#e8d5a3 0%,#c9a84c 45%,#e8c5ce 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-clip:text;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.final-sub{
-  font-family:'Jost',sans-serif;font-weight:200;
-  font-size:clamp(11px,1.8vw,13px);
-  letter-spacing:0.35em;
-  color:rgba(253,248,240,0.4);
-  text-transform:uppercase;
-}
-.rose-final{
-  font-size:42px;
-  display:inline-block;
-  margin:28px 0;
-  animation:pulse 1.5s ease infinite;
-}
+.final-sub{font-family:'Jost',sans-serif;font-weight:200;font-size:clamp(11px,1.8vw,13px);letter-spacing:0.35em;color:rgba(253,248,240,0.4);text-transform:uppercase;}
+.rose-final{font-size:42px;display:inline-block;margin:28px 0;animation:pulse 1.5s ease infinite;}
 
-/* ===================== ANIMATIONS ===================== */
+/* ══ KEYFRAMES ══ */
+@keyframes floatRose{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+@keyframes ripple{0%{opacity:1;transform:scale(1);}100%{opacity:0;transform:scale(1.5);}}
 @keyframes heartbeat{
-  0%,100%{transform:rotate(45deg) scale(1);}
-  14%{transform:rotate(45deg) scale(1.25);}
-  28%{transform:rotate(45deg) scale(1);}
-  42%{transform:rotate(45deg) scale(1.15);}
+  0%,100%{transform:rotate(45deg) scale(1);}14%{transform:rotate(45deg) scale(1.25);}
+  28%{transform:rotate(45deg) scale(1);}42%{transform:rotate(45deg) scale(1.15);}
 }
-@keyframes pulse{
-  0%,100%{transform:scale(1);}
-  50%{transform:scale(1.12);}
-}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
 </style>
 </head>
 <body>
 
+<audio id="bg-music" loop>
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<!-- ══ SPLASH ══ -->
+<div id="splash">
+  <div class="splash-rose">🌹</div>
+  <p class="splash-title">A little something for</p>
+  <h1 class="splash-name">Hanonty</h1>
+  <div class="tap-btn">
+    <div class="tap-ring">
+      <!-- play icon -->
+      <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    </div>
+    <span class="tap-label">Tap to begin</span>
+  </div>
+</div>
+
+<!-- ══ MUTE BTN ══ -->
+<button id="mute-btn" aria-label="Toggle music">
+  <svg id="icon-on" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+  <svg id="icon-off" viewBox="0 0 24 24" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+</button>
+
 <canvas id="petals"></canvas>
 
-<!-- ══════════ STAGE 1: COUNTDOWN ══════════ -->
-<div class="stage active" id="stage-countdown">
+<!-- ══ STAGE 1: COUNTDOWN ══ -->
+<div class="stage" id="stage-countdown">
   <div class="countdown-ring">
     <svg viewBox="0 0 200 200" width="200" height="200">
       <circle class="ring-bg" cx="100" cy="100" r="90"/>
@@ -384,7 +310,7 @@ html,body{
   <p class="countdown-label">Something beautiful is loading…</p>
 </div>
 
-<!-- ══════════ STAGE 2: HAPPY BIRTHDAY ══════════ -->
+<!-- ══ STAGE 2: HAPPY BIRTHDAY ══ -->
 <div class="stage" id="stage-hb">
   <p class="hb-line1" id="hb1">Happy Birthday</p>
   <h1 class="hb-name" id="hb-name">Hanonty</h1>
@@ -396,57 +322,44 @@ html,body{
   <p class="hb-sub" id="hb-sub">From Ahmed Fathy, with all his heart</p>
 </div>
 
-<!-- ══════════ STAGE 3: SCROLL CONTENT ══════════ -->
+<!-- ══ STAGE 3: SCROLL ══ -->
 <div class="scroll-bg" id="scroll-bg"></div>
-
 <div id="stage-scroll">
 
-  <!-- PHOTOS -->
   <div class="section">
     <p class="sec-label">Our story</p>
     <h2 class="sec-heading">Moments I treasure</h2>
-
     <div class="photos-grid">
 
-      <!-- Replace src with your actual photo files -->
       <div class="photo-card" id="pc1">
-        <img src="photo1.jpg" alt="A memory together"
-          onerror="this.style.display='none'">
-        <div class="photo-placeholder" id="ph1">
+        <img src="photo1.jpg" alt="A memory" onerror="this.style.display='none'">
+        <div class="photo-placeholder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
-          </svg>
-          <span>Add photo</span>
+            <circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg><span>Add photo</span>
         </div>
         <div class="photo-caption">The first time I knew</div>
       </div>
 
       <div class="photo-card" id="pc2">
-        <img src="photo2.jpg" alt="Another memory"
-          onerror="this.style.display='none'">
-        <div class="photo-placeholder" id="ph2">
+        <img src="photo2.jpg" alt="A memory" onerror="this.style.display='none'">
+        <div class="photo-placeholder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
-          </svg>
-          <span>Add photo</span>
+            <circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg><span>Add photo</span>
         </div>
         <div class="photo-caption">My favourite smile</div>
       </div>
 
       <div class="photo-card" id="pc3">
-        <img src="photo3.jpg" alt="A cherished moment"
-          onerror="this.style.display='none'">
-        <div class="photo-placeholder" id="ph3">
+        <img src="photo3.jpg" alt="A memory" onerror="this.style.display='none'">
+        <div class="photo-placeholder">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
-          </svg>
-          <span>Add photo</span>
+            <circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+          </svg><span>Add photo</span>
         </div>
         <div class="photo-caption">Every day with you</div>
       </div>
@@ -454,64 +367,41 @@ html,body{
     </div>
   </div>
 
-  <!-- LETTER -->
   <div class="section letter-section">
     <p class="sec-label">From the heart</p>
     <h2 class="sec-heading">A letter for you</h2>
-
     <div class="divider">
       <div class="div-line"></div><div class="div-gem"></div><div class="div-line"></div>
     </div>
-
     <div class="letter-wrap" id="letter">
       <span class="letter-dear">My dearest Hanonty,</span>
-
       <div class="letter-body">
-        <p>
-          There are days I look at you and wonder how I got lucky enough to have someone like you
-          in my life. Not just someone who is beautiful — though you are, effortlessly — but someone
-          whose presence genuinely makes the world feel like a better, softer place.
-        </p>
-        <p>
-          You have this rare gift: you make the people around you feel seen. The way you listen,
-          the way you laugh, the way you care — it's something I never take for granted.
-          Every small moment with you has become one of my favourite things about being alive.
-        </p>
-        <p>
-          On your birthday, I want you to know that you deserve every beautiful thing this life has
-          to offer. You deserve mornings that feel like poetry, days filled with warmth, and nights
-          that feel like home. I hope this year brings you all of it — and more than you've even
-          thought to wish for.
-        </p>
-        <p>
-          Thank you for being exactly who you are. I wouldn't change a single thing.
-        </p>
+        <p>There are days I look at you and wonder how I got lucky enough to have someone like you in my life. Not just someone who is beautiful — though you are, effortlessly — but someone whose presence genuinely makes the world feel like a better, softer place.</p>
+        <p>You have this rare gift: you make the people around you feel seen. The way you listen, the way you laugh, the way you care — it's something I never take for granted. Every small moment with you has become one of my favourite things about being alive.</p>
+        <p>On your birthday, I want you to know that you deserve every beautiful thing this life has to offer. You deserve mornings that feel like poetry, days filled with warmth, and nights that feel like home. I hope this year brings you all of it — and more than you've even thought to wish for.</p>
+        <p>Thank you for being exactly who you are. I wouldn't change a single thing.</p>
       </div>
-
       <span class="letter-sig">Forever yours, Ahmed Fathy ♡</span>
     </div>
   </div>
 
-  <!-- FINAL -->
   <div class="section final-section">
-    <p class="final-sub" style="margin-bottom:0">Wishing you the most beautiful year</p>
+    <p class="final-sub">Wishing you the most beautiful year</p>
     <div class="rose-final">🌹</div>
     <h2 class="final-big">Happy Birthday,<br>Hanonty</h2>
     <p class="final-sub" style="margin-top:18px">With all my heart · Always · Ahmed</p>
   </div>
 
-</div><!-- /stage-scroll -->
+</div>
 
 <script>
-/* ─── PETALS ─── */
-const canvas = document.getElementById('petals');
-const ctx = canvas.getContext('2d');
+/* ── PETALS ── */
+const canvas=document.getElementById('petals'),ctx=canvas.getContext('2d');
 let W,H,petals=[];
 function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
 resize();window.addEventListener('resize',resize);
 function mkPetal(){
-  return{x:Math.random()*W,y:-20,
-    size:Math.random()*7+3,
+  return{x:Math.random()*W,y:-20,size:Math.random()*7+3,
     vy:Math.random()*1+0.35,vx:(Math.random()-0.5)*0.5,
     rot:Math.random()*Math.PI*2,rs:(Math.random()-0.5)*0.04,
     op:Math.random()*0.35+0.08,
@@ -520,9 +410,8 @@ function mkPetal(){
       :`rgba(201,168,76,${(Math.random()*0.22+0.05).toFixed(2)})`};
 }
 let frame=0;
-function drawPetals(){
-  ctx.clearRect(0,0,W,H);
-  frame++;
+(function drawPetals(){
+  ctx.clearRect(0,0,W,H);frame++;
   if(frame%20===0&&petals.length<50)petals.push(mkPetal());
   petals=petals.filter(p=>p.y<H+30);
   petals.forEach(p=>{
@@ -533,67 +422,86 @@ function drawPetals(){
     ctx.fill();ctx.restore();
   });
   requestAnimationFrame(drawPetals);
-}
-drawPetals();
+})();
 
-/* ─── SEQUENCE ─── */
-const stageCD  = document.getElementById('stage-countdown');
-const stageHB  = document.getElementById('stage-hb');
-const stageScr = document.getElementById('stage-scroll');
-const scrollBg = document.getElementById('scroll-bg');
-const ring     = document.getElementById('ring');
-const cdNum    = document.getElementById('cd-num');
-const CIRC     = 2*Math.PI*90; // 565.48
+/* ── AUDIO ── */
+const music=document.getElementById('bg-music');
+const muteBtn=document.getElementById('mute-btn');
+const iconOn=document.getElementById('icon-on');
+const iconOff=document.getElementById('icon-off');
+let muted=false;
+music.volume=0.55;
 
-function setRing(pct){ ring.style.strokeDashoffset = CIRC*(1-pct); }
+muteBtn.addEventListener('click',()=>{
+  muted=!muted;music.muted=muted;
+  iconOn.style.display=muted?'none':'block';
+  iconOff.style.display=muted?'block':'none';
+});
+
+/* ── SPLASH → START ── */
+const splash=document.getElementById('splash');
+document.body.style.overflow='hidden';
+
+splash.addEventListener('click',()=>{
+  // User gesture — play is now allowed
+  music.play().catch(()=>{});
+  muteBtn.classList.add('show');
+  splash.classList.add('hide');
+  setTimeout(()=>{
+    splash.style.display='none';
+    startCountdown();
+  },800);
+},{once:true});
+
+/* ── COUNTDOWN ── */
+const stageCD=document.getElementById('stage-countdown');
+const stageHB=document.getElementById('stage-hb');
+const stageScr=document.getElementById('stage-scroll');
+const scrollBg=document.getElementById('scroll-bg');
+const ring=document.getElementById('ring');
+const cdNum=document.getElementById('cd-num');
+const CIRC=2*Math.PI*90;
+let count=3;
+
+function setRing(pct){ring.style.strokeDashoffset=CIRC*(1-pct);}
 setRing(1);
 
-let count = 3;
+function startCountdown(){
+  stageCD.classList.add('active');
+  tickCountdown();
+}
 
 function tickCountdown(){
-  // animate ring for current number (1 second)
-  const start = performance.now();
-  function animRing(now){
-    const elapsed = now - start;
-    const pct = Math.max(0, 1 - elapsed/1000);
-    setRing(pct * (count/3)); // ring shrinks relative to fraction of 3
-    if(elapsed < 1000){ requestAnimationFrame(animRing); }
-  }
-  requestAnimationFrame(animRing);
+  const start=performance.now();
+  (function animRing(now){
+    const elapsed=now-start,pct=Math.max(0,1-elapsed/1000);
+    setRing(pct*(count/3));
+    if(elapsed<1000)requestAnimationFrame(animRing);
+  })(performance.now());
 
   setTimeout(()=>{
     count--;
-    if(count > 0){
-      cdNum.style.opacity='0';
-      cdNum.style.transform='scale(1.4)';
-      cdNum.style.transition='opacity 0.2s ease, transform 0.2s ease';
+    if(count>0){
+      cdNum.style.opacity='0';cdNum.style.transform='scale(1.4)';
       setTimeout(()=>{
-        cdNum.textContent = count;
-        cdNum.style.opacity='1';
-        cdNum.style.transform='scale(1)';
-        setRing(count/3);
-        tickCountdown();
+        cdNum.textContent=count;
+        cdNum.style.opacity='1';cdNum.style.transform='scale(1)';
+        setRing(count/3);tickCountdown();
       },220);
-    } else {
-      // countdown done → transition to HB
-      goToHB();
-    }
-  }, 1000);
+    } else {goToHB();}
+  },1000);
 }
-tickCountdown();
 
 function goToHB(){
   stageCD.classList.add('out');
   setTimeout(()=>{
     stageCD.style.display='none';
     stageHB.classList.add('active');
-    // staggered reveals
     setTimeout(()=>document.getElementById('hb1').classList.add('show'),100);
     setTimeout(()=>document.getElementById('hb-name').classList.add('show'),400);
     setTimeout(()=>document.getElementById('hb-hearts').classList.add('show'),900);
     setTimeout(()=>document.getElementById('hb-sub').classList.add('show'),1100);
-    // after ~3.5s go to scroll
-    setTimeout(goToScroll, 3600);
+    setTimeout(goToScroll,3600);
   },700);
 }
 
@@ -601,41 +509,27 @@ function goToScroll(){
   stageHB.classList.add('out');
   setTimeout(()=>{
     stageHB.style.display='none';
-    // release scroll content
     document.body.style.overflow='auto';
     stageScr.classList.add('active');
     scrollBg.classList.add('active');
-    // pop photos with stagger
-    setTimeout(()=>popPhotos(),400);
-    // reveal letter on scroll
+    setTimeout(popPhotos,400);
     setupLetterReveal();
   },700);
 }
 
 function popPhotos(){
   ['pc1','pc2','pc3'].forEach((id,i)=>{
-    setTimeout(()=>{
-      const el = document.getElementById(id);
-      el.classList.add('pop');
-    }, i*220);
+    setTimeout(()=>document.getElementById(id).classList.add('pop'),i*220);
   });
 }
 
 function setupLetterReveal(){
-  const letter = document.getElementById('letter');
-  const obs = new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting){
-        letter.classList.add('reveal');
-        obs.disconnect();
-      }
-    });
+  const letter=document.getElementById('letter');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){letter.classList.add('reveal');obs.disconnect();}});
   },{threshold:0.15});
   obs.observe(letter);
 }
-
-// Lock scroll until scroll stage
-document.body.style.overflow='hidden';
 </script>
 </body>
 </html>
